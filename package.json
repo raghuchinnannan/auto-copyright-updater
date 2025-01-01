@@ -1,0 +1,36 @@
+{
+    "name": "auto-copyright-updater",
+    "version": "1.0.0",
+    "description": "Automatically updates copyright years in website footers with configurable formatting options",
+    "main": "dist/auto-copyright-updater.js",
+    "scripts": {
+        "test": "jest",
+        "build": "webpack"
+    },
+    "keywords": [
+        "copyright",
+        "automation",
+        "webpack-plugin",
+        "footer",
+        "year-update",
+        "automatic copyright updater"
+    ],
+    "author": "Raghu Chinnannan <info@raghu.ch> (https://raghu.ch/)",
+    "license": "MIT",
+    "dependencies": {
+        "cheerio": "^1.0.0-rc.12",
+        "glob": "^10.3.3"
+    },
+    "devDependencies": {
+        "jest": "^29.6.0",
+        "webpack": "^5.88.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/raghuchinnannan/auto-copyright-updater.git"
+    },
+    "bugs": {
+        "url": "https://github.com/raghuchinnannan/auto-copyright-updater/issues"
+    },
+    "homepage": "https://a2plugins.com"
+}

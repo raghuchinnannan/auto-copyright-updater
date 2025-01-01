@@ -1,0 +1,7 @@
+src/
+test/
+example/
+coverage/
+.DS_Store
+webpack.config.js
+jest.config.js
