@@ -1,5 +1,3 @@
-// src/index.js
-
 const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
@@ -14,6 +12,10 @@ class AutoCopyrightUpdater {
       copyrightSelector: '.copyright',
       format: 'range', // 'range' or 'current'
       rangeDelimiter: '-', // customize the delimiter between years
+      startYear: null, // explicitly set start year
+      // If no startYear is provided, will try these strategies in order:
+      // 1. Use existing year from HTML if present
+      // 2. Use current year
       preserveStartYear: true, // keep original start year in range
       template: '© ${year} Company Name', // year will be replaced with formatted year
       ...options
@@ -31,30 +33,45 @@ class AutoCopyrightUpdater {
     if (typeof this.options.template !== 'string' || !this.options.template.includes('${year}')) {
       throw new Error('Template must be a string containing ${year} placeholder');
     }
+
+    if (this.options.startYear !== null) {
+      const startYear = parseInt(this.options.startYear);
+      if (isNaN(startYear) || startYear < 1900 || startYear > new Date().getFullYear()) {
+        throw new Error('startYear must be a valid year between 1900 and current year');
+      }
+    }
   }
 
-  apply(compiler) {
-    // Register the plugin with webpack
-    compiler.hooks.afterEmit.tapAsync(
-      'AutoCopyrightUpdater',
-      (compilation, callback) => {
-        const outputPath = compilation.outputOptions.path;
-        this.updateCopyright(outputPath, callback);
+  getStartYear(existingContent) {
+    const currentYear = new Date().getFullYear();
+
+    // Case 1: Explicitly provided start year
+    if (this.options.startYear !== null) {
+      return parseInt(this.options.startYear);
+    }
+
+    // Case 2: Extract from existing content if present
+    if (this.options.preserveStartYear) {
+      const startYearMatch = existingContent.match(/\d{4}/);
+      if (startYearMatch) {
+        return parseInt(startYearMatch[0]);
       }
-    );
+    }
+
+    // Case 3: Default to current year
+    return currentYear;
   }
 
   formatYear(existingContent) {
     const currentYear = new Date().getFullYear();
-    const startYearMatch = existingContent.match(/\d{4}/);
-    const startYear = startYearMatch ? parseInt(startYearMatch[0]) : currentYear;
+    const startYear = this.getStartYear(existingContent);
 
     // Handle different format options
     if (this.options.format === 'current') {
       return currentYear.toString();
     }
 
-    if (this.options.format === 'range' && this.options.preserveStartYear) {
+    if (this.options.format === 'range') {
       return startYear === currentYear ? 
         currentYear.toString() : 
         `${startYear}${this.options.rangeDelimiter}${currentYear}`;
